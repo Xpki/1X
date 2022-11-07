@@ -1,7 +1,7 @@
-if game.PlaceId == 5602055394 then
+if game.PlaceId == 9825515356 then
     local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 local Window = Library.CreateLib("1X", "BloodTheme")
-local Tab = Window:NewTab("Aimlock")
+local Tab = Window:NewTab("AimLock")
 local Section = Tab:NewSection("Lock")
 Section:NewButton("Aimlock", "", function(bool)
      getgenv().AimPart = "HumanoidRootPart"
@@ -198,6 +198,39 @@ Section:NewDropdown("AimPart", "", {"Head","HumanoidRootPart","UpperTorso","Lowe
     getgenv().AimPart = value
 end)
 
+local Tab = Window:NewTab("Slient Aim")
+local Section = Tab:NewSection("Silent Aim")
+
+Section:NewToggle("Silent Aim", "", function(state)
+    if state then
+        DaHoodSettings.SilentAim = true
+    else
+        DaHoodSettings.SilentAim = false
+    end
+end)
+
+Section:NewTextBox("Silent Aim Prediction", "", function(loob)
+	DaHoodSettings.Prediction = loob
+end)
+
+Section:NewDropdown("Slient Aim Part", "", {"Head","HumanoidRootPart","UpperTorso","LowerTorso"}, function(balue)
+    Aiming.AimPart = balue
+end)
+
+Section:NewTextBox("FOV Size", "", function(poob)
+	Aiming.FOV = poob
+end)
+
+
+Section:NewToggle("Toggle FOV", "", function(state)
+    if state then
+        Aiming.ShowFOV = true
+    else
+        Aiming.ShowFOV = false
+    end
+end)
+
+
 local Tab = Window:NewTab("Settings")
 local Section = Tab:NewSection("Menu Settings")
 
@@ -237,5 +270,64 @@ Section:NewToggle(
 end
 )
 
+local Aiming = loadstring(game:HttpGet("https://pastebin.com/raw/vsVecTqs"))()
+Aiming.TeamCheck(false)
 
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local CurrentCamera = Workspace.CurrentCamera
+
+local DaHoodSettings = {
+    SilentAim = false,
+    AimLock = false,
+    Prediction = 0.157,
+    AimLockKeybind = Enum.KeyCode.E
+}
+getgenv().DaHoodSettings = DaHoodSettings
+
+function Aiming.Check()
+    if not (Aiming.Enabled == true and Aiming.Selected ~= LocalPlayer and Aiming.SelectedPart ~= nil) then
+        return false
+    end
+
+    local Character = Aiming.Character(Aiming.Selected)
+    local KOd = Character:WaitForChild("BodyEffects")["K.O"].Value
+    local Grabbed = Character:FindFirstChild("GRABBING_CONSTRAINT") ~= nil
+
+    if (KOd or Grabbed) then
+        return false
+    end
+
+    return true
+end
+
+local __index
+__index = hookmetamethod(game, "__index", function(t, k)
+    if (t:IsA("Mouse") and (k == "Hit" or k == "Target") and Aiming.Check()) then
+        local SelectedPart = Aiming.SelectedPart
+
+        if (DaHoodSettings.SilentAim and (k == "Hit" or k == "Target")) then
+            local Hit = SelectedPart.CFrame + (SelectedPart.Velocity * DaHoodSettings.Prediction)
+
+            return (k == "Hit" and Hit or SelectedPart)
+        end
+    end
+
+    return __index(t, k)
+end)
+
+RunService:BindToRenderStep("AimLock", 0, function()
+    if (DaHoodSettings.AimLock and Aiming.Check() and UserInputService:IsKeyDown(DaHoodSettings.AimLockKeybind)) then
+        local SelectedPart = Aiming.SelectedPart
+
+        local Hit = SelectedPart.CFrame + (SelectedPart.Velocity * DaHoodSettings.Prediction)
+
+        CurrentCamera.CFrame = CFrame.lookAt(CurrentCamera.CFrame.Position, Hit.Position)
+    end
+end)
 end

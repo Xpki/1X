@@ -2,7 +2,7 @@
 -- // under is a anti aim viewer script
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Nosssa/NossLock/main/AntiAimViewer"))()
 
-local Aiming = loadstring(game:HttpGet("https://pastebin.com/raw/QVHZsmWc"))()
+local Aiming = loadstring(game:HttpGet("https://raw.githubusercontent.com/Xpki/1X/main/bruhaiming"))()
 Aiming.TeamCheck(false)
 
 local Workspace = game:GetService("Workspace")

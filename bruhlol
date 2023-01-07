@@ -1,7 +1,3 @@
--- // thank shquals (CHRISTIAN#1770) for this leak
--- // under is a anti aim viewer script
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Nosssa/NossLock/main/AntiAimViewer"))()
-
 local Aiming = loadstring(game:HttpGet("https://raw.githubusercontent.com/Xpki/1X/main/bruhaiming"))()
 Aiming.TeamCheck(false)
 
